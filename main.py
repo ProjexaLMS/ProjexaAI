@@ -1,45 +1,41 @@
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer
 import torch
 
 app = FastAPI()
 
-# Initialize the pipeline with the model (openai/gpt-oss-20b)
+# Initialize the pipeline with the model
 model_id = "openai/gpt-oss-20b"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
 pipe = pipeline(
     "text-generation",
     model=model_id,
-    torch_dtype=torch.float32,  # Explicitly use CPU-based precision
-    device=-1,  # Set device=-1 to force CPU usage
+    torch_dtype=torch.float32,  # Use CPU-based precision
+    device=-1,  # Set device=-1 for CPU usage
 )
 
 system_prompt = "You are an AI assistant knowledgeable in various topics. Respond in a helpful, concise, and clear manner."
 
 
 class LargeTextRequest(BaseModel):
-    text: str 
+    text: str
 
 
 def chunk_text(text, chunk_size=1024):
     """Chunk the input text into pieces smaller than the token limit."""
-    words = text.split()
+    tokens = tokenizer.encode(text, return_tensors="pt")[0]
     chunks = []
     current_chunk = []
-    current_chunk_size = 0
 
-    for word in words:
-        word_size = len(word.split())  # Simple word length approximation
-        if current_chunk_size + word_size > chunk_size:
-            chunks.append(" ".join(current_chunk))
-            current_chunk = [word]
-            current_chunk_size = word_size
-        else:
-            current_chunk.append(word)
-            current_chunk_size += word_size
+    for token in tokens:
+        current_chunk.append(token)
+        if len(current_chunk) >= chunk_size:
+            chunks.append(tokenizer.decode(current_chunk))
+            current_chunk = []
 
     if current_chunk:
-        chunks.append(" ".join(current_chunk))
+        chunks.append(tokenizer.decode(current_chunk))
 
     return chunks
 
@@ -49,15 +45,15 @@ async def generate_text(request: LargeTextRequest):
     try:
         large_text = request.text
 
+        # Chunk the large text
         text_chunks = chunk_text(large_text, chunk_size=1024)
 
         generated_responses = []
 
+        # Generate text for each chunk
         for chunk in text_chunks:
             full_prompt = system_prompt + "\n" + chunk
-
             outputs = pipe([full_prompt], max_new_tokens=256)
-
             generated_text = outputs[0]["generated_text"]
             generated_responses.append(generated_text)
 
