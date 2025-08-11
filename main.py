@@ -5,14 +5,15 @@ import torch
 
 app = FastAPI()
 
-# Initialize the pipeline with the model
-model_id = "openai/gpt-oss-20b"
+# Initialize the tokenizer and model
+model_id = "unsloth/gpt-oss-20b-BF16"  # FP16-compatible model
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 pipe = pipeline(
     "text-generation",
     model=model_id,
-    torch_dtype=torch.float32,  # Use CPU-based precision
-    device=-1,  # Set device=-1 for CPU usage
+    tokenizer=tokenizer,
+    torch_dtype=torch.float16,  # Use FP16 precision
+    device=-1,  # Use CPU
 )
 
 system_prompt = "You are an AI assistant knowledgeable in various topics. Respond in a helpful, concise, and clear manner."
