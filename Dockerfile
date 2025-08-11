@@ -9,11 +9,10 @@ COPY ./main.py /app/app.py
 
 # Step 4: Install the necessary Python dependencies
 RUN pip install --no-cache-dir \
-    torch==1.13.0+cpu \
-    transformers==4.25.0 \
-    fastapi==0.95.0 \
-    uvicorn==0.20.0
-
+    torch \
+    transformers \
+    fastapi \
+    uvicorn
 # Step 5: Expose the port that FastAPI will run on
 EXPOSE 8000
 
