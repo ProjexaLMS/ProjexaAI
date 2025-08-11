@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Step 3: Copy the application files into the container
-COPY ./app.py /app/app.py
+COPY ./main.py /app/app.py
 
 # Step 4: Install the necessary Python dependencies
 RUN pip install --no-cache-dir \
