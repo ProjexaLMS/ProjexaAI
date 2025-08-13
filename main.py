@@ -28,8 +28,8 @@ OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
 # Hard safety limits
 MAX_BYTES = int(os.getenv("PROJEXA_MAX_BYTES", str(512 * 1024)))  # 512 KiB per request
 MAX_WORDS_OUT = int(os.getenv("PROJEXA_MAX_WORDS_OUT", "500"))  # Aligns w/ your rules
-STREAM_TIMEOUT_S = float(os.getenv("PROJEXA_STREAM_TIMEOUT_S", "120"))
-OLLAMA_TIMEOUT_S = float(os.getenv("PROJEXA_OLLAMA_TIMEOUT_S", "60"))
+STREAM_TIMEOUT_S = float(os.getenv("PROJEXA_STREAM_TIMEOUT_S", "300"))
+OLLAMA_TIMEOUT_S = float(os.getenv("PROJEXA_OLLAMA_TIMEOUT_S", "300"))
 
 # Reasonable defaults for generation
 DEFAULT_OPTIONS: Dict[str, Any] = {

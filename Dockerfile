@@ -40,6 +40,6 @@ done; \
 echo 'Pulling model: llama3.2:3b'; \
 (ollama pull llama3.2:3b || true); \
 echo 'Starting FastAPI on 0.0.0.0:8000 (internal only)...'; \
-exec uvicorn main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 300 \
+exec uvicorn main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 600 \
 "]
 # ---------- End ----------
