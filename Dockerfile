@@ -1,20 +1,33 @@
-# Step 1: Start with a Python image
-FROM python:3.9-slim
+FROM ubuntu:22.04
 
-# Step 2: Set the working directory in the container
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PROJEXA_DISPLAY_NAME=projexa \
+    OLLAMA_BACKEND_MODEL=llama3.2:3b \
+    OLLAMA_HOST=http://127.0.0.1:11434
+
+# System deps
+RUN apt-get update && apt-get install -y \
+    curl ca-certificates python3 python3-pip \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install Ollama daemon + CLI
+RUN curl -fsSL https://ollama.com/install.sh | sh
+
 WORKDIR /app
 
-# Step 3: Copy the application files into the container
-COPY ./main.py /app/app.py
+# Python deps
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Step 4: Install the necessary Python dependencies
-RUN pip install --no-cache-dir \
-    torch \
-    transformers \
-    fastapi \
-    uvicorn
-# Step 5: Expose the port that FastAPI will run on
-EXPOSE 8000
+# Your FastAPI app (the file that contains `app = FastAPI(...)`)
+# Rename this if your filename is different.
+COPY app.py .
 
-# Step 6: Command to run the FastAPI app using Uvicorn
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+EXPOSE 8000 11434
+CMD ["/start.sh"]
