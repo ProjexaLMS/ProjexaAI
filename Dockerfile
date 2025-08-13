@@ -23,7 +23,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Your FastAPI app (the file that contains `app = FastAPI(...)`)
 # Rename this if your filename is different.
-COPY app.py .
+COPY main.py .
 
 # Startup script
 COPY start.sh /start.sh
