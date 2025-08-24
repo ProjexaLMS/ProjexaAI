@@ -1,0 +1,1 @@
+A small FastAPI service that streams concise, plain-text summaries of a single code file using an Ollama-hosted LLM. It enforces a 500-word cap, strips Markdown/code fences from the stream, and never reveals its system prompt. Health and readiness endpoints are included, and CORS is configurable.
